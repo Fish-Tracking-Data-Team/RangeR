@@ -4,7 +4,7 @@
 \title{Extract transmissions from VR100 logfile
 %%  ~~function to do ... ~~
 }
-\description{
+\description{Takes the VR100 detection record and extracts the required data
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
