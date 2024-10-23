@@ -1,11 +1,11 @@
 Package: RangeR
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Toolbox for Calculating Range of Acoustic Telemetry Systems 
 Version: 0.1.0
-Author: Hugh Pederson - Innovasea
-Maintainer: Hugh Pederson (hugh.pederson@innovasea.com)
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Author: Hugh Pederson
+Maintainer: Hugh Pederson <hugh.pederson@innovasea.com>
+Description: Collection of functions to manipulate field data and calculate the effective range of Innovasea acoustic receivers
+Depends: tidyverse, lubridate, sf
+License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
