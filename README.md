@@ -25,3 +25,42 @@ Step to calculate Dift Range Test
 6.  extract transmission from the VR100 log using extract_VR100_transmission
 7.  extract the detection data from the stationery receiver using drift_detections()
 8.  compile drift analysis using compile_drifts()
+
+
+## Main Functions
+
+### Select Devices
+`select_devices()`
+
+Selection of the stationary receiver which defines the detection data and the device (VR100) used to record the transmission of acoustic signals
+
+### Get Deployment Time
+`get_deployment_time()`
+
+A function designed to automatically calculate the start and the end of the stationary receiver deployment using the in-built tilt sensor. When performing range tests using VR2W receivers, users define start and end times manually. 
+
+### Select Range Transmitter
+`select_range_transmitter`
+
+The function scans the transmission data from the VR100 identified by select_devices() and allows the user to define the full ID code of the transmitter being used in the range test. 
+
+### Extract (VR100) Transmissions
+`extract_VR100_transmission`
+
+Creates a dataframe from the VR100 log filtering be the full ID code defined by the `select_range_transmitter` function.  
+
+
+# Installation
+
+- **R** `RangeR` requires`R` version ≥ 4.1 which can be installed from **R-project [`R`](https://www.r-project.org)**. If you are unsure of your R version, try `R.version.string` from the `R` console. To update R from within RStudio, install and load the `installr` package and run `updateR()`
+
+- **Install remotes**
+``` 
+# Install the remotes package
+install.packages("remotes")
+
+# Use remotes to install the FathomR package from github repo
+remotes::install_github("hughpederson/RangeR", 
+                        build_vignettes = TRUE,
+                        dependencies = TRUE)
+```
