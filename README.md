@@ -2,6 +2,19 @@
 
 RangeR package for calculating the effective range of Innovasea acoustic receivers, along with other handy functions for easy manipulation of acoustic telemetry data. Useful function include distance between receiver calculations, find closest neighbouring receiver, geodetic to utm conversions and more.
 
+## Overview
+
+### Mobile (Drift) Range Tests
+
+Mobile range tests, often referred to a drift tests involve deployment of a stationary receiver and moving a transmitter within the detection field. 
+
+Mobile range tests are often short term and do not cover a wide range of environmental conditions which can impact detection range. While not incorporating environmental variation, mobile range tests can capture a greater range of distance measures between the receiver and transmission source.  
+
+### Static Range Tests
+
+Static range tests typically span longer time scales than mobile range tests but are typically limited to sampling a very small number of distances between receivers and the transmission source. The benefit of static tests is their ability to capture a greater range of enviornmental variability.  
+
+
 Step to calculate Dift Range Test
 
 1.  parse logfiles from stationary receiver using FathomR::parse_fathom_files()
