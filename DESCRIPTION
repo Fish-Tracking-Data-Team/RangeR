@@ -5,7 +5,7 @@ Version: 0.1.0
 Authors@R: c(
     person("Hugh", "Pederson", email = "hugh.pederson@innovasea.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-0899-2978")))
 Description: Collection of functions to manipulate field data and calculate the effective range of Innovasea acoustic receivers
-Depends: tidyverse, lubridate, sf, xml2
+Depends: tidyverse, lubridate, sf, xml2, geosphere
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
