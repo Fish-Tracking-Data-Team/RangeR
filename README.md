@@ -47,7 +47,20 @@ The function scans the transmission data from the VR100 identified by select_dev
 ### Extract (VR100) Transmissions
 `extract_VR100_transmission`
 
-Creates a dataframe from the VR100 log filtering be the full ID code defined by the `select_range_transmitter` function.  
+Creates a dataframe from the VR100 log containing detections filtered by the full ID code defined in the `select_range_transmitter` function.  
+
+
+### Drift Detections
+`drift_detections()`
+
+Creates a dataframe of the detections matching the full ID defined by `select_range_transmitter` function on the receiver defined by the `select_devices` function. 
+
+### Compile Drifts
+`compile_drifts()`
+
+Combines transmission data defined by the `extract_VR100_transmission` function and the corresponding detection data defined by the `drift_detections` function. Data is combined based on time matching using a time buffer parameter defined by the user. 
+
+
 
 
 # Installation
