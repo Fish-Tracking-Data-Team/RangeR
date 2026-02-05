@@ -4,7 +4,7 @@
 \title{Extract transmissions from VR100 logfile
 %%  ~~function to do ... ~~
 }
-\description{Takes the VR100 detection record and extracts the required data
+\description{Takes the detection dataframe (supplied by FathomR::parse_fathom_files) and extracts the detections captured in the VR100 logfile matching the Serial number selected using RangeR::select_devices()
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
@@ -12,7 +12,7 @@ extract_VR100_transmission(x)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{
+  \item{x}{Dataframe containing detections supplied by FathomR::parse_fathom_files. The default dataframe when parsing fathom interleaved csv is labelled 'det'.
 %%     ~~Describe \code{x} here~~
 }
 }

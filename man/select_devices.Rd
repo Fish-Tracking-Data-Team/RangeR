@@ -4,7 +4,7 @@
 \title{Select the VR100 and Receiver
 %%  ~~function to do ... ~~
 }
-\description{
+\description{Helper function to define the VR100 and acoustic receiver used in the drift test. User is supplied with a selection of receiver serial numbers in the console for selection.
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
@@ -12,7 +12,7 @@ select_devices(x)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{
+  \item{x}{The detection dataframe supplied by FathomR::parse_fathom_files
 %%     ~~Describe \code{x} here~~
 }
 }
