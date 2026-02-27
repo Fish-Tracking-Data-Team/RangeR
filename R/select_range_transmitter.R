@@ -1,3 +1,14 @@
+#' Interactively select a range-test transmitter
+#'
+#' Prints counts by `Full ID` and prompts for a selection.
+#'
+#' @param det Data frame with a `Full ID` column.
+#' @return A length-one character vector containing the selected `Full ID`.
+#' @examples
+#' \dontrun{
+#' rtt_transmitter <- select_range_transmitter(det)
+#' }
+#' @export
 select_range_transmitter <- function(det) {
   # Group by 'Full ID' and count the instances
   full_id_counts <- det %>%

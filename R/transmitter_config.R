@@ -1,3 +1,18 @@
+#' Build a transmitter configuration table
+#'
+#' Filters active transmitters at the reference station, computes nominal delay,
+#' and attaches model metadata.
+#'
+#' @param cfg_transmitter Data frame of transmitter configuration records with
+#'   `Serial`, `Full ID`, `Min Delay (s)`, `Max Delay (s)`, and `Power Level`.
+#' @param stations Data frame of station metadata with `Serial` and `distance`.
+#' @return A data frame with `Full.ID`, delay fields, `Power Level`, `nom_delay`,
+#'   and `model`.
+#' @examples
+#' \dontrun{
+#' transmitters <- transmitter_config(cfg_transmitter, stations)
+#' }
+#' @export
 transmitter_config <- function(cfg_transmitter, stations){
 
 transmitters <- cfg_transmitter %>%

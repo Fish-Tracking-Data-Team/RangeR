@@ -1,4 +1,16 @@
-
+#' Compute receiver separation distances
+#'
+#' Computes pairwise Haversine distances between receiver locations.
+#'
+#' @param dist_set Data frame with `Long`, `Lat`, and `Station` columns.
+#' @return A data frame with `receiver_id`, `neighbor_id`, and `distance` in
+#'   meters for all receiver pairs.
+#' @importFrom geosphere distm distHaversine
+#' @examples
+#' \dontrun{
+#' separations <- receiver_separations(dist_set)
+#' }
+#' @export
 receiver_separations <- function(dist_set) {
    # Calculate the distance matrix
   dist_matrix <- distm(dist_set[, c("Long", "Lat")], fun = distHaversine)
@@ -17,5 +29,3 @@ receiver_separations <- function(dist_set) {
     dplyr::mutate(receiver_id = as.character(receiver_id),
                   neighbor_id = as.character(neighbor_id))
 }
-
-

@@ -1,3 +1,14 @@
+#' Interactively select VR100 and receiver serials
+#'
+#' Prints unique device combinations and prompts for row selections.
+#'
+#' @param det Data frame with `Model` and `Serial` columns.
+#' @return A list with `VR100_serial` and `receiver_serial`.
+#' @examples
+#' \dontrun{
+#' ids <- select_devices(det)
+#' }
+#' @export
 select_devices <- function(det) {
   # Create a data frame of unique 'Model' and 'Serial' combinations
   device_list <- det %>%

@@ -1,3 +1,28 @@
+#' Calculate detection probability curves by tag model
+#'
+#' Fits logistic regression models of detection success versus distance for each
+#' transmitter model and returns a combined plot and probability table.
+#'
+#' @param detection_data Data frame of detections with at least `Serial`,
+#'   `Full ID`, and `Time` columns.
+#' @param transmitters Data frame of transmitter metadata (for example from
+#'   `transmitter_config()`) that includes `Full.ID` and `model`.
+#' @param stations.red Data frame of receiver metadata with `Serial`, `Station`,
+#'   and `distance` columns.
+#' @param minTime,maxTime Start and end timestamps used to filter detections.
+#' @param nom_delay Interval string passed to `lubridate::floor_date()` and used
+#'   for padding (for example `"5 min"`).
+#' @return A `grob` produced by `gridExtra::grid.arrange()` containing the
+#'   detection probability curve and a probability table.
+#' @importFrom padr pad fill_by_value
+#' @importFrom gridExtra grid.arrange tableGrob ttheme_default
+#' @examples
+#' \dontrun{
+#' p <- calculate_range(detection_data, transmitters, stations.red,
+#'                      minTime, maxTime, nom_delay = "5 min")
+#' p
+#' }
+#' @export
   calculate_range <- function(detection_data, transmitters, stations.red, minTime, maxTime, nom_delay) {
     # Prepare the data
     range_test_detection_data <- detection_data %>%

@@ -1,4 +1,23 @@
-
+#' Compile drift detections and fit a detection model
+#'
+#' Joins transmitter pings to detections within a time buffer, filters by
+#' distance, and fits a logistic model of detection probability versus distance.
+#'
+#' @param detection.data Data frame of detections with `Serial`, `Time`,
+#'   `Full ID`, and `distance` columns.
+#' @param transmit.data Data frame of transmitter pings with at least `Time`.
+#' @param time_buffer Time tolerance in seconds used for the fuzzy time join.
+#' @param dist_threshold Maximum distance (in meters) retained for modeling.
+#' @return A list with:
+#'   `compiled_data` containing detection outcomes and distances, and
+#'   `predictions` containing model-predicted probabilities by distance.
+#' @importFrom fuzzyjoin fuzzy_left_join
+#' @examples
+#' \dontrun{
+#' res <- compile_drifts(detection.data, transmit.data, time_buffer = 5)
+#' head(res$predictions)
+#' }
+#' @export
 compile_drifts <- function(detection.data, transmit.data, time_buffer = 5, dist_threshold = 1200) {
   serial_values <- unique(detection.data$Serial)
 

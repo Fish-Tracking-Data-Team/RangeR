@@ -1,4 +1,23 @@
-get_deplpoyment_time <- function(diag_fast, min_tilt = 0, max_tilt = 60, n) {
+#' Estimate operational deployment windows from tilt data
+#'
+#' Flags non-operational periods when tilt exceeds `max_tilt` for `n` consecutive
+#' records, then returns the longest operational window per receiver.
+#'
+#' @param diag_fast Data frame with `Serial`, `Time`, and `Tilt (deg)` columns.
+#' @param min_tilt Minimum tilt threshold. Currently unused.
+#' @param max_tilt Maximum tilt threshold used to flag non-operational periods.
+#' @param n Number of consecutive records above `max_tilt` that mark a receiver
+#'   as non-operational.
+#' @return A list with:
+#'   `minTime` and `maxTime` for the shared operational window, and
+#'   `operational_periods` containing the longest operational period per Serial.
+#' @examples
+#' \dontrun{
+#' res <- get_deployment_time(diag_fast, max_tilt = 60, n = 5)
+#' res$minTime
+#' }
+#' @export
+get_deployment_time <- function(diag_fast, min_tilt = 0, max_tilt = 60, n) {
   diag_fast <- diag_fast %>%
     mutate(Tilt = as.numeric(`Tilt (deg)`))
 
@@ -35,4 +54,11 @@ get_deplpoyment_time <- function(diag_fast, min_tilt = 0, max_tilt = 60, n) {
   maxTime <- min(operational_periods$end)
 
   return(list(minTime = minTime, maxTime = maxTime, operational_periods = operational_periods))
+}
+
+#' @rdname get_deployment_time
+#' @export
+get_deplpoyment_time <- function(diag_fast, min_tilt = 0, max_tilt = 60, n) {
+  .Deprecated("get_deployment_time")
+  get_deployment_time(diag_fast, min_tilt = min_tilt, max_tilt = max_tilt, n = n)
 }

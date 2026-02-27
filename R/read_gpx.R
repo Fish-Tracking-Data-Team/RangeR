@@ -1,3 +1,18 @@
+#' Read a GPX file into layer-wise `sf` objects
+#'
+#' Reads all layers in a GPX file using `sf::st_read()` and returns a named list.
+#' Optionally extracts track point extensions (water temperature and depth).
+#'
+#' @param file_path Path to the GPX file.
+#' @param extract_extension If `TRUE`, parses `TrackPointExtension` values in the
+#'   `track_points` layer and appends `wtemp` and `depth` columns.
+#' @return A named list of `sf` objects, one per GPX layer.
+#' @examples
+#' \dontrun{
+#' gpx <- read_gpx("track.gpx", extract_extension = TRUE)
+#' names(gpx)
+#' }
+#' @export
 read_gpx <- function(file_path, extract_extension = FALSE) {
   extract_trackpoint_extension <- function(sf_object) {
 
