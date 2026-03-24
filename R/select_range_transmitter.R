@@ -3,38 +3,35 @@
 #' Prints counts by `Full ID` and prompts for a selection.
 #'
 #' @param det Data frame with a `Full ID` column.
-#' @return A length-one character vector containing the selected `Full ID`.
+#' @return A character vector containing one or more selected `Full ID` values.
 #' @examples
 #' \dontrun{
 #' rtt_transmitter <- select_range_transmitter(det)
 #' }
 #' @export
 select_range_transmitter <- function(det) {
-  # Group by 'Full ID' and count the instances
-  full_id_counts <- det %>%
-    group_by(`Full ID`) %>%
-    summarise(count = n()) %>%
-    arrange(desc(count))
+    full_id_counts <- det %>% 
+    filter(Model == 'VR100') %>%
+    count(`Full ID`, name = "count", sort = TRUE)
 
-  # Print the 'Full ID' counts
-  print(full_id_counts)
+    print(full_id_counts)
 
-  # Ask the user to select a row number
-  selected_row <- as.integer(readline(prompt = "Please enter the row number for the 'Full ID' you would like to use: "))
+    selected_rows <- readline(
+        prompt = "Please enter one or more row numbers for the 'Full ID' values you would like to use, separated by commas: "
+    ) %>%
+        strsplit(",") %>%
+        unlist() %>%
+        trimws() %>%
+        as.integer()
 
-  # Check if the selected row number is valid
-  if(selected_row > 0 & selected_row <= nrow(full_id_counts)) {
-    # Get the 'Full ID' for the selected row
-    selected_id <- full_id_counts$`Full ID`[selected_row]
+    if (length(selected_rows) == 0 || any(is.na(selected_rows))) {
+        stop("Please provide one or more valid row numbers.")
+    }
 
-    # Extract the vector containing the 'Full ID'
-    rtt_transmitter <- det %>%
-      filter(`Full ID` == selected_id) %>%
-      group_by(`Full ID`) %>%
-      slice(1) %>%
-      pull(`Full ID`)
-    return(rtt_transmitter)
-  } else {
-    stop("The selected row number is not valid.")
-  }
+    if (any(selected_rows < 1 | selected_rows > nrow(full_id_counts))) {
+        stop("One or more selected row numbers are not valid.")
+    }
+
+    full_id_counts$`Full ID`[selected_rows] %>%
+        unique()
 }
