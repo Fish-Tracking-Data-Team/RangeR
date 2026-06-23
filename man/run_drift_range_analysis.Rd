@@ -11,6 +11,8 @@ run_drift_range_analysis(
   devices,
   transmitter_ids,
   station_location,
+  transmission_source = c("VR100", "GPS_tracklog"),
+  synthetic_transmit_data = NULL,
   time_buffer = 5,
   dist_threshold = 1200
 )
@@ -29,6 +31,11 @@ analyze.}
 object giving the station longitude and latitude used for distance
 calculations.}
 
+\item{transmission_source}{Either \code{"VR100"} or \code{"GPS_tracklog"}.}
+
+\item{synthetic_transmit_data}{Optional synthetic transmission table used
+when \code{transmission_source = "GPS_tracklog"}.}
+
 \item{time_buffer}{Time tolerance in seconds used when matching transmitter
 pings to detections.}
 
@@ -37,7 +44,7 @@ pings to detections.}
 \value{
 A list containing combined \code{transmit_data}, \code{detection_data},
 \code{compiled_data}, \code{predictions}, \code{summary}, and the analyzed
-\code{transmitter_ids}.
+\code{transmitter_ids}. Includes \code{transmission_source} in the result.
 }
 \description{
 Filters drift detections to a time window, compiles detection outcomes for
@@ -51,7 +58,8 @@ res <- run_drift_range_analysis(
   end_time,
   devices,
   transmitter_ids,
-  station_location
+  station_location,
+  transmission_source = "VR100"
 )
 head(res$summary)
 }

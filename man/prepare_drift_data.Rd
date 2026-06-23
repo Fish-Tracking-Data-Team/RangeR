@@ -10,7 +10,9 @@ prepare_drift_data(
   end_time,
   devices,
   transmitter_id,
-  station_location
+  station_location,
+  transmission_source = c("VR100", "GPS_tracklog"),
+  synthetic_transmit_data = NULL
 )
 }
 \arguments{
@@ -26,13 +28,19 @@ prepare_drift_data(
 \item{station_location}{Numeric vector, matrix row, or two-column coordinate
 object giving the station longitude and latitude used for distance
 calculations.}
+
+\item{transmission_source}{Either \code{"VR100"} or \code{"GPS_tracklog"}.}
+
+\item{synthetic_transmit_data}{Optional synthetic transmission table used
+when \code{transmission_source = "GPS_tracklog"}.}
 }
 \value{
 A list with \code{transmit_data} and \code{detection_data}.
 }
 \description{
 Subsets detections by time window, device serials, and transmitter ID, then
-calculates transmitter-to-station distance for VR100 records.
+calculates transmitter-to-station distance for observed or synthetic
+transmission records.
 }
 \examples{
 \dontrun{
@@ -42,7 +50,8 @@ drift_data <- prepare_drift_data(
   end_time,
   devices,
   transmitter_id,
-  station_location
+  station_location,
+  transmission_source = "VR100"
 )
 names(drift_data)
 }

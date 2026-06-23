@@ -1,0 +1,230 @@
+---
+title: "Synthetic Tracklog Workflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Synthetic Tracklog Workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+This vignette shows how to build synthetic transmitter detections from a GPS tracklog and then run the standard RangeR drift-range workflow. It is designed for deployments where the drift path is available as a tracklog and synthetic transmissions need to be generated before the range analysis is fitted.
+
+## Packages
+
+Load RangeR and the packages used in the workflow.
+
+```{r packages}
+library(FathomR)
+library(RangeR)
+library(readr)
+library(dplyr)
+library(purrr)
+```
+
+## Choose The Transmission Source
+
+Set the transmission source to the GPS tracklog workflow.
+
+```{r transmission-source}
+transmission_source <- "GPS_tracklog"
+```
+
+## Load Fathom Files And Deployment Metadata
+
+Parse the receiver logfiles and read the station metadata used to define the receiver deployment location.
+
+```{r load-data}
+data <- FathomR::parse_fathom_files(
+  "./source_data/drift_test/gps_tracklog/logfiles",
+  output = "list"
+)
+
+stations <- readr::read_csv(
+  "./source_data/drift_test/gps_tracklog/metadata/TA_01_deployment.csv",
+  show_col_types = FALSE
+)
+
+station_row <- 1
+```
+
+## Define The Station Location
+
+Use `resolve_station_location()` to standardise the station input and return the selected station row with its `station_location` vector.
+
+```{r station-location}
+station_details <- resolve_station_location(
+  stations = stations,
+  station_row = station_row
+)
+```
+
+## Select Transmitters And Devices
+
+Extract the detections table, then select the transmitters and device serials to include in the workflow.
+
+```{r select-devices}
+det <- data$det
+
+transmitters <- select_range_transmitter(
+  det = det,
+  transmission_source = transmission_source
+)
+
+devices <- select_devices(
+  det = det,
+  transmission_source = transmission_source
+)
+```
+
+## Load Transmitter Specifications
+
+Read the Innovasea transmitter specifications and derive the time buffer used to align synthetic transmissions with the drift analysis.
+
+```{r transmitter-specs}
+tag_specs <- innovasea_transmitter_spec(
+  path = "./source_data/spec_sheets/OrderSheet_78215.xls",
+  sheet_hint = "tag summary",
+  drop_missing_ids = TRUE
+)
+
+tag_delays <- tag_specs$delays
+
+time_buffer_details <- resolve_time_buffer(
+  tag_delays = tag_delays,
+  full_id_candidates = transmitters,
+  full_id = if (length(transmitters) == 1) transmitters[[1]] else NULL
+)
+
+time_buffer <- time_buffer_details$time_buffer
+delay <- time_buffer + 6
+```
+
+## Inspect The GPS Tracklog Inputs
+
+Read the GPS tracklog and drift-window files used to construct the synthetic transmission schedule. This is optional, but it helps confirm the expected structure before synthetic detections are generated.
+
+```{r inspect-tracklog-files}
+gps_tracklog_path <- "./source_data/drift_test/gps_tracklog/metadata/TA_01_drift_tracklog.csv"
+drift_windows_path <- "./source_data/drift_test/gps_tracklog/metadata/TA_01_drift_times.csv"
+
+gps_tracklog <- readr::read_csv(gps_tracklog_path, show_col_types = FALSE)
+drift_windows <- readr::read_csv(drift_windows_path, show_col_types = FALSE)
+```
+
+## Define Synthetic Transmission Settings
+
+Collect the settings shared across all transmitters in the synthetic schedule. Passing all transmitters in one call allows `offset_sec` to stagger each `Full ID` relative to the next.
+
+```{r synthetic-settings}
+synthetic_log_settings <- list(
+  gps_tracklog_path = gps_tracklog_path,
+  drift_windows_path = drift_windows_path,
+  delay_sec = delay,
+  max_gap_sec = 0,
+  tracklog_offset_hours = 0,
+  drift_offset_hours = 0,
+  csv_dayfirst = TRUE,
+  drift_dayfirst = TRUE,
+  span_full = FALSE,
+  snap_mode = "interp",
+  offset_sec = 15
+)
+```
+
+## Estimate The Deployment Window
+
+Use the diagnostic data stream to estimate the deployment window, then inspect the result with the deployment-window plot.
+
+```{r deployment-window}
+names(data)
+
+diag <- data$diag_nextrak
+
+deployment_times <- get_deployment_time(
+  diag_fast = diag,
+  min_tilt = 0,
+  max_tilt = 60,
+  n = 5
+)
+
+plot_deployment_windows(
+  diag_data = diag,
+  deployment_time_result = deployment_times
+)
+```
+
+If necessary, manually adjust the deployment window before fitting the range model.
+
+```{r deployment-override}
+# deployment_times$maxTime <- deployment_times$maxTime + 86400
+```
+
+## Build Synthetic Transmissions
+
+Generate the synthetic transmission schedule from the GPS tracklog and drift-window definitions.
+
+```{r build-synthetic-log}
+synthetic_transmission_schedule <- build_synthetic_transmission_log(
+  full_id = transmitters,
+  gps_tracklog_path = synthetic_log_settings$gps_tracklog_path,
+  drift_windows_path = synthetic_log_settings$drift_windows_path,
+  delay_sec = synthetic_log_settings$delay_sec,
+  max_gap_sec = synthetic_log_settings$max_gap_sec,
+  tracklog_offset_hours = synthetic_log_settings$tracklog_offset_hours,
+  drift_offset_hours = synthetic_log_settings$drift_offset_hours,
+  csv_dayfirst = synthetic_log_settings$csv_dayfirst,
+  drift_dayfirst = synthetic_log_settings$drift_dayfirst,
+  span_full = synthetic_log_settings$span_full,
+  snap_mode = synthetic_log_settings$snap_mode,
+  offset_sec = synthetic_log_settings$offset_sec
+)
+```
+
+## Run The Drift-Range Analysis
+
+Fit the standard RangeR drift-range workflow using the observed detections together with the synthetic transmission schedule.
+
+```{r run-analysis}
+range_est <- run_drift_range_analysis(
+  det = det,
+  start_time = deployment_times$minTime,
+  end_time = deployment_times$maxTime,
+  devices = devices,
+  transmitter_ids = transmitters,
+  station_location = station_details$station_location,
+  transmission_source = transmission_source,
+  synthetic_transmit_data = synthetic_transmission_schedule,
+  time_buffer = time_buffer,
+  dist_threshold = 1200
+)
+```
+
+## Plot The Fitted Detection Curve
+
+Plot the fitted detection curve or curves for the selected transmitters.
+
+```{r plot-results}
+plot_drift_results(
+  range_est,
+  title = if (length(transmitters) == 1) {
+    paste0("Detection curve for ", transmitters)
+  } else {
+    "Detection curves"
+  },
+  subtitle = paste("Transmitters:", paste(transmitters, collapse = ", ")),
+  x_limits = c(0, 800),
+  x_breaks = seq(0, 800, 100)
+)
+```
+
+## Notes
+
+This vignette keeps all code chunks unevaluated because it depends on external Fathom logfiles, metadata, and specification sheets that are not bundled with the package. To run it locally, update the file paths to your own data and evaluate the chunks interactively.

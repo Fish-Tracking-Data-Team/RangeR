@@ -1,14 +1,17 @@
 Package: RangeR
 Type: Package
 Title: Toolbox for Calculating Range of Acoustic Telemetry Systems 
-Version: 0.1.0
+Version: 0.1.3
 Authors@R: c(
     person("Hugh", "Pederson", email = "hugh.pederson@innovasea.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-0899-2978")))
 Description: Collection of functions to manipulate field data and calculate the effective range of Innovasea acoustic receivers
-Depends: tidyverse, lubridate, sf, xml2, geosphere
-Imports: gridExtra, padr, fuzzyjoin
+Depends: tidyverse, lubridate, sf, xml2, geosphere, fuzzyjoin
+Imports: gridExtra, padr
+Suggests: knitr, rmarkdown
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
+VignetteBuilder: knitr
+

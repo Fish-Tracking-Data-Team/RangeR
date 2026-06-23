@@ -2,18 +2,20 @@
 % Please edit documentation in R/select_devices.R
 \name{select_devices}
 \alias{select_devices}
-\title{Interactively select VR100 and receiver serials}
+\title{Interactively select receiver and VR100 device serials}
 \usage{
-select_devices(det)
+select_devices(det, transmission_source = c("VR100", "GPS_tracklog"))
 }
 \arguments{
 \item{det}{Data frame with \code{Model} and \code{Serial} columns.}
+
+\item{transmission_source}{Either \code{"VR100"} or \code{"GPS_tracklog"}.}
 }
 \value{
-A list with \code{VR100_serial} and \code{receiver_serial}.
+A list with \code{receiver_serial} and \code{VR100_serial}.
 }
 \description{
-Prints unique device combinations and prompts for row selections.
+Prints available device serials and prompts for row selections.
 }
 \examples{
 \dontrun{

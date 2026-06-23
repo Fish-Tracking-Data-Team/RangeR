@@ -1,0 +1,154 @@
+---
+title: "VR100 Tracklog Workflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{VR100 Tracklog Workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+This vignette shows a typical RangeR workflow for estimating detection range from VR100 logged transmissions and a GPS tracklog-backed drift deployment. It is adapted from an interactive reproducible example script and is intended as a worked example you can tailor to your own file paths and station metadata.
+
+## Packages
+
+Load RangeR and the packages used in the workflow.
+
+```{r packages}
+library(FathomR)
+library(RangeR)
+library(readr)
+library(dplyr)
+library(purrr)
+library(ggplot2)
+```
+
+## Choose The Transmission Source
+
+Set the transmission source for the workflow.
+
+```{r transmission-source}
+transmission_source <- "VR100"
+```
+
+## Load Parsed Fathom Files
+
+Parse the receiver logfiles into a list object containing the detections and diagnostics needed for the workflow.
+
+```{r parse-fathom-files}
+data <- FathomR::parse_fathom_files(
+  "./source_data/drift_test/logfiles",
+  output = "list"
+)
+```
+
+## Define The Station Location
+
+Station metadata can be created in place or read from a file. `resolve_station_location()` standardises the input and returns the selected station row together with a `station_location` vector that can be passed into downstream RangeR functions.
+
+```{r station-metadata}
+stations <- data.frame(
+  latitude = c(-42.6665),
+  longitude = c(147.9767),
+  Serial = c(548851)
+)
+
+stations <- resolve_station_location(
+  stations = stations,
+  station_row = NULL
+)
+```
+
+If you have multiple stations, either set `station_row` explicitly or leave it as `NULL` in an interactive session to choose a row.
+
+## Select Transmitters And Devices
+
+Extract the detections table, then choose the transmitter IDs and device serial numbers to include in the analysis.
+
+```{r select-devices}
+det <- data$det
+
+transmitters <- select_range_transmitter(
+  det = det,
+  transmission_source = transmission_source
+)
+
+devices <- select_devices(
+  det = det,
+  transmission_source = transmission_source
+)
+```
+
+## Estimate The Deployment Window
+
+Use the diagnostics stream to estimate the start and end of the deployment window. The same diagnostics can also be plotted to visually check whether the automatic deployment detection is sensible.
+
+```{r deployment-window}
+diag <- data$diag
+
+deployment_times <- get_deployment_time(
+  diag_fast = diag,
+  min_tilt = 0,
+  max_tilt = 60,
+  n = 5
+)
+
+plot_deployment_windows(
+  diag_data = diag,
+  deployment_time_result = deployment_times
+)
+```
+
+If the detected deployment window is not correct, you can manually adjust it before running the range analysis.
+
+```{r deployment-override}
+# deployment_times$maxTime <- deployment_times$maxTime + 86400
+```
+
+## Run The Drift-Range Analysis
+
+Pass the selected transmitters, deployment window, station location, and transmission source into `run_drift_range_analysis()`.
+
+```{r run-analysis}
+range_est <- run_drift_range_analysis(
+  det = det,
+  start_time = deployment_times$minTime,
+  end_time = deployment_times$maxTime,
+  devices = devices,
+  transmitter_ids = transmitters,
+  station_location = stations$station_location,
+  transmission_source = transmission_source,
+  synthetic_transmit_data = NULL,
+  time_buffer = 5,
+  dist_threshold = 1200
+)
+```
+
+## Plot The Fitted Detection Curve
+
+Plot the fitted detection curve, using a single-title or multi-transmitter title depending on the number of transmitters selected.
+
+```{r plot-results}
+plot_drift_results(
+  range_est,
+  title = if (length(transmitters) == 1) {
+    paste0("Detection curve for ", transmitters)
+  } else {
+    "Detection curves"
+  },
+  subtitle = paste("Transmitters:", paste(transmitters, collapse = ", ")),
+  x_limits = c(0, 1200),
+  x_breaks = seq(0, 1200, 100)
+)
+```
+
+## Notes
+
+This example keeps all code chunks unevaluated because the workflow depends on external VR100/Fathom files that are not shipped with the package. To run the vignette locally, update the file paths to your own data and evaluate the chunks interactively.

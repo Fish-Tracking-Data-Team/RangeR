@@ -2,12 +2,21 @@
 % Please edit documentation in R/select_range_transmitter.R
 \name{select_range_transmitter}
 \alias{select_range_transmitter}
-\title{Interactively select a range-test transmitter}
+\title{Interactively select one or more range-test transmitters}
 \usage{
-select_range_transmitter(det)
+select_range_transmitter(
+  det,
+  transmission_source = c("VR100", "GPS_tracklog"),
+  synthetic_transmit_data = NULL
+)
 }
 \arguments{
-\item{det}{Data frame with a \verb{Full ID} column.}
+\item{det}{Data frame with \verb{Full ID} and \code{Model} columns.}
+
+\item{transmission_source}{Either \code{"VR100"} or \code{"GPS_tracklog"}.}
+
+\item{synthetic_transmit_data}{Optional synthetic transmission table used
+when \code{transmission_source = "GPS_tracklog"}.}
 }
 \value{
 A character vector containing one or more selected \verb{Full ID} values.

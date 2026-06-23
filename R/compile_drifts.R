@@ -25,38 +25,38 @@ compile_drifts <- function(detection.data,
     serial_values <- unique(detection.data$Serial)
 
     results <- purrr::map(serial_values, function(serial_value) {
-        df_subset <- detection.data %>%
-            filter(Serial == serial_value)
+        df_subset <- detection.data |>
+            dplyr::filter(Serial == serial_value)
 
         fuzzy_left_join(
             transmit.data,
             df_subset,
             by = c(Time = "Time"),
             match_fun = list(function(x, y) abs(difftime(x, y, units = "secs")) < time_buffer)
-        ) %>%
-            mutate(
+        ) |>
+            dplyr::mutate(
                 success = ifelse(!is.na(`Full ID.y`), 1, 0),
                 Serial = serial_value
-            ) %>%
+            ) |>
             dplyr::select(Time.x, Serial.x, Serial.y, Serial, `Full ID.y`, distance, success)
     })
 
-    detection_table <- bind_rows(results) %>%
-        arrange(Serial, Time.x) %>%
-        dplyr::select(distance, success) %>%
-        filter(distance <= dist_threshold)
+    detection_table <- dplyr::bind_rows(results) |>
+        dplyr::arrange(Serial, Time.x) |>
+        dplyr::select(distance, success) |>
+        dplyr::filter(distance <= dist_threshold)
 
     anchor <- data.frame(
         distance = rep(0, nrow(transmit.data)),
         success = rep(1, nrow(transmit.data))
     )
 
-    compiled_data <- bind_rows(detection_table, anchor)
-    drift_glm <- glm(success ~ distance, data = compiled_data, family = binomial)
+    compiled_data <- dplyr::bind_rows(detection_table, anchor)
+    drift_glm <- stats::glm(success ~ distance, data = compiled_data, family = stats::binomial)
     predictions <- data.frame(
         distance = seq(min(detection_table$distance), max(detection_table$distance), length.out = 500)
     )
-    predictions$prob <- predict(drift_glm, newdata = predictions, type = "response")
+    predictions$prob <- stats::predict(drift_glm, newdata = predictions, type = "response")
 
     list(
         compiled_data = compiled_data,
