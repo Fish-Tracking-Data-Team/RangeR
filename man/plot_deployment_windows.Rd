@@ -2,21 +2,27 @@
 % Please edit documentation in R/plot_deployment_windows.R
 \name{plot_deployment_windows}
 \alias{plot_deployment_windows}
-\title{Plot receiver deployment windows from diagnostic tilt data}
+\title{Plot receiver deployment windows from diagnostic data}
 \usage{
 plot_deployment_windows(
   diag_data,
   deployment_time_result,
+  diagnostic = c("tilt", "noise", "both"),
   free_x = FALSE,
   label_size = 8
 )
 }
 \arguments{
-\item{diag_data}{Data frame containing at least \code{Serial}, \code{Time}, and
-\code{Tilt (deg)} columns.}
+\item{diag_data}{Data frame containing at least \code{Serial}, \code{Time}, and the
+diagnostic columns required by \code{diagnostic}.}
 
 \item{deployment_time_result}{A list containing an \code{operational_periods}
 element with \code{Serial}, \code{start}, \code{end}, and \code{duration_days} columns.}
+
+\item{diagnostic}{Character scalar indicating which diagnostic to plot.
+Must be one of \code{"tilt"}, \code{"noise"}, or \code{"both"}. When \code{"both"} is
+selected, noise panels are fixed to \code{0-900} while tilt panels use their
+own y-axis ranges.}
 
 \item{free_x}{Logical; if \code{TRUE}, allow each facet to use its own x-axis
 scale.}
@@ -25,18 +31,22 @@ scale.}
 and end labels.}
 }
 \value{
-A \code{ggplot2} object showing tilt over time with deployment window
-annotations.
+A \code{ggplot2} object showing the selected diagnostic over time with
+deployment window annotations.
 }
 \description{
-Creates a faceted time-series plot of receiver tilt with annotated deployment
-start and end times derived from \code{get_deployment_time()}. Each facet shows a
-receiver serial number with vertical markers for deployment bounds and a
-label describing deployment duration.
+Creates a faceted time-series plot of receiver diagnostics with annotated
+deployment start and end times derived from \code{get_deployment_time()}. Each
+facet shows a receiver serial number with vertical markers for deployment
+bounds and a label describing deployment duration.
 }
 \examples{
 \dontrun{
-p <- plot_deployment_windows(diag_data, deployment_time_result)
+p <- plot_deployment_windows(
+  diag_data,
+  deployment_time_result,
+  diagnostic = "both"
+)
 p
 }
 }

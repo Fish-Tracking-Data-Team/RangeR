@@ -10,7 +10,8 @@ calculate_range(
   stations.red,
   minTime,
   maxTime,
-  nom_delay
+  nom_delay,
+  prediction_distance_max = NULL
 )
 }
 \arguments{
@@ -27,6 +28,10 @@ and \code{distance} columns.}
 
 \item{nom_delay}{Interval string passed to \code{lubridate::floor_date()} and used
 for padding (for example \code{"5 min"}).}
+
+\item{prediction_distance_max}{Optional maximum distance in meters used when
+generating the prediction curve. Defaults to the maximum observed distance
+in the filtered detection data.}
 }
 \value{
 A \code{grob} produced by \code{gridExtra::grid.arrange()} containing the

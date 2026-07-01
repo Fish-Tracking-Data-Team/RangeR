@@ -14,7 +14,8 @@ run_drift_range_analysis(
   transmission_source = c("VR100", "GPS_tracklog"),
   synthetic_transmit_data = NULL,
   time_buffer = 5,
-  dist_threshold = 1200
+  dist_threshold = 1200,
+  prediction_distance_max = NULL
 )
 }
 \arguments{
@@ -40,6 +41,10 @@ when \code{transmission_source = "GPS_tracklog"}.}
 pings to detections.}
 
 \item{dist_threshold}{Maximum distance in meters retained for model fitting.}
+
+\item{prediction_distance_max}{Optional maximum distance in meters used when
+generating prediction curves. Defaults to the maximum modeled distance for
+each transmitter.}
 }
 \value{
 A list containing combined \code{transmit_data}, \code{detection_data},

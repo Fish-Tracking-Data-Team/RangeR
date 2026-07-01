@@ -17,6 +17,9 @@
 #' @param time_buffer Time tolerance in seconds used when matching transmitter
 #'   pings to detections.
 #' @param dist_threshold Maximum distance in meters retained for model fitting.
+#' @param prediction_distance_max Optional maximum distance in meters used when
+#'   generating prediction curves. Defaults to the maximum modeled distance for
+#'   each transmitter.
 #' @return A list containing combined `transmit_data`, `detection_data`,
 #'   `compiled_data`, `predictions`, `summary`, and the analyzed
 #'   `transmitter_ids`. Includes `transmission_source` in the result.
@@ -43,7 +46,8 @@ run_drift_range_analysis <- function(det,
                                      transmission_source = c("VR100", "GPS_tracklog"),
                                      synthetic_transmit_data = NULL,
                                      time_buffer = 5,
-                                     dist_threshold = 1200) {
+                                     dist_threshold = 1200,
+                                     prediction_distance_max = NULL) {
     transmission_source <- match.arg(transmission_source)
 
     if (identical(transmission_source, "VR100") && !is.null(synthetic_transmit_data)) {
@@ -79,7 +83,8 @@ run_drift_range_analysis <- function(det,
             detection.data = drift_data$detection_data,
             transmit.data = drift_data$transmit_data,
             time_buffer = time_buffer,
-            dist_threshold = dist_threshold
+            dist_threshold = dist_threshold,
+            prediction_distance_max = prediction_distance_max
         )
 
         range_50 <- drift_result$predictions |>
@@ -111,5 +116,3 @@ run_drift_range_analysis <- function(det,
         summary = dplyr::bind_rows(purrr::map(results, "summary"))
     )
 }
-
-

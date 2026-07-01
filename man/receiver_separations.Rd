@@ -4,20 +4,27 @@
 \alias{receiver_separations}
 \title{Compute receiver separation distances}
 \usage{
-receiver_separations(dist_set)
+receiver_separations(dist_set, reference_station = NULL)
 }
 \arguments{
-\item{dist_set}{Data frame with \code{Long}, \code{Lat}, and \code{Station} columns.}
+\item{dist_set}{Data frame with \code{Long}, \code{Lat}, \code{Station}, and \code{Serial}
+columns.}
+
+\item{reference_station}{Optional character vector of \code{Station} values to use
+as the reference locations. When supplied, distances are calculated from
+those stations to all stations in \code{dist_set}. When \code{NULL}, all pairwise
+station distances are returned.}
 }
 \value{
-A data frame with \code{receiver_id}, \code{neighbor_id}, and \code{distance} in
-meters for all receiver pairs.
+A data frame with \code{Ref_Station}, \code{Station}, \code{Serial}, and \code{distance}
+in meters for the requested receiver pairs.
 }
 \description{
-Computes pairwise Haversine distances between receiver locations.
+Computes Haversine distances between receiver locations.
 }
 \examples{
 \dontrun{
 separations <- receiver_separations(dist_set)
+separations_from_ref <- receiver_separations(dist_set, reference_station = c("ST01"))
 }
 }

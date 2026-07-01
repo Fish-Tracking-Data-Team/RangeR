@@ -1,0 +1,138 @@
+---
+title: "Static Test Multi-Receiver Workflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Static Test Multi-Receiver Workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+This vignette shows a typical RangeR workflow for estimating detection range from a static test with multiple receivers. It is adapted from a local reproducible example script and demonstrates how to prepare receiver metadata, estimate deployment windows from diagnostics, inspect deployment plots, and fit the static-range model.
+
+## Packages
+
+Load RangeR and the packages used in the workflow.
+
+```{r packages}
+library(FathomR)
+library(RangeR)
+library(readr)
+```
+
+## Load Deployment Metadata
+
+Read the deployment metadata used to define receiver positions and station names for the static test.
+
+```{r load-stations}
+stations <- readr::read_csv(
+  "./source_data/static_test_multi_receiver/deployment_metadata.csv",
+  show_col_types = FALSE
+)
+```
+
+## Prepare Receiver Metadata
+
+Standardise the station metadata so receiver locations and serial numbers can be used in the static-range workflow.
+
+```{r prepare-receivers}
+receiver_prep <- RangeR::prepare_distance_df(
+  stations,
+  lat_col = "latitude",
+  long_col = "longitude",
+  station_col = "Station",
+  serial_col = "Serial"
+)
+```
+
+## Calculate Receiver Separations
+
+Use the nominated reference station to calculate distances between the reference receiver and all other stations in the array.
+
+```{r receiver-separations}
+distance_df <- RangeR::receiver_separations(
+  receiver_prep,
+  reference_station = "RT2"
+)
+```
+
+## Load Parsed Fathom Files
+
+Parse the filtered Fathom logfiles into a list object containing detections, diagnostics, and transmitter configuration information.
+
+```{r parse-fathom-files}
+data <- FathomR::parse_fathom_files(
+  "./source_data/static_test_multi_receiver/logfiles/fathom_filtered_time_window"
+)
+```
+
+## Estimate The Deployment Window
+
+Use the diagnostics stream to estimate the deployment start and end times for the receivers in the static test.
+
+```{r deployment-window}
+deployment_times <- get_deployment_time(
+  data$diag,
+  min_tilt = 6,
+  max_tilt = 40,
+  n = 5
+)
+```
+
+## Check The Deployment Duration
+
+Inspect the estimated deployment duration before fitting the range model.
+
+```{r deployment-duration}
+as.numeric(deployment_times$maxTime - deployment_times$minTime)
+```
+
+## Plot Receiver Diagnostics
+
+Plot both tilt and noise diagnostics to visually confirm the detected deployment window.
+
+```{r plot-diagnostics}
+plot_deployment_windows(
+  diag_data = data$diag,
+  deployment_time_result = deployment_times,
+  diagnostic = "both"
+)
+```
+
+## Derive The Transmitter Configuration
+
+Extract the reference-station transmitter programming from the parsed configuration data and link it to the receiver separation table.
+
+```{r transmitter-config}
+transmitters <- transmitter_config(
+  data$cfg_transmitter,
+  distance_df
+)
+```
+
+## Calculate Detection Range
+
+Fit the static-range workflow using the observed detections, derived transmitter configuration, and estimated deployment window.
+
+```{r calculate-range}
+range_est <- calculate_range(
+  data$det,
+  transmitters,
+  distance_df,
+  deployment_times$minTime,
+  deployment_times$maxTime,
+  nom_delay = transmitters$nom_delay,
+  prediction_distance_max = 1500
+)
+```
+
+## Notes
+
+This vignette keeps all code chunks unevaluated because it depends on external Fathom files and metadata that are not bundled with the package. To run it locally, update the file paths to your own static-test inputs and evaluate the chunks interactively.

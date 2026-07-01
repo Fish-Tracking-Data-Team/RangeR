@@ -12,6 +12,9 @@
 #' @param minTime,maxTime Start and end timestamps used to filter detections.
 #' @param nom_delay Interval string passed to `lubridate::floor_date()` and used
 #'   for padding (for example `"5 min"`).
+#' @param prediction_distance_max Optional maximum distance in meters used when
+#'   generating the prediction curve. Defaults to the maximum observed distance
+#'   in the filtered detection data.
 #' @return A `grob` produced by `gridExtra::grid.arrange()` containing the
 #'   detection probability curve and a probability table.
 #' @importFrom padr pad fill_by_value
@@ -23,7 +26,13 @@
 #' p
 #' }
 #' @export
-  calculate_range <- function(detection_data, transmitters, stations.red, minTime, maxTime, nom_delay) {
+  calculate_range <- function(detection_data,
+                              transmitters,
+                              stations.red,
+                              minTime,
+                              maxTime,
+                              nom_delay,
+                              prediction_distance_max = NULL) {
     # Prepare the data
     range_test_detection_data <- detection_data %>%
       filter(`Full ID` %in% transmitters$Full.ID) %>%
@@ -39,6 +48,32 @@
       left_join(select(stations.red, Serial, Station, distance), by = 'Serial') %>%
       left_join(transmitters, by = join_by(`Full ID` == Full.ID))
 
+    observed_max_distance <- max(range_test_detection_data$distance, na.rm = TRUE)
+
+    if (!is.null(prediction_distance_max)) {
+      if (!is.numeric(prediction_distance_max) ||
+          length(prediction_distance_max) != 1 ||
+          !is.finite(prediction_distance_max)) {
+        stop(
+          "`prediction_distance_max` must be a single finite numeric value.",
+          call. = FALSE
+        )
+      }
+
+      if (prediction_distance_max < observed_max_distance) {
+        stop(
+          "`prediction_distance_max` must be greater than or equal to the maximum observed distance.",
+          call. = FALSE
+        )
+      }
+    }
+
+    prediction_distance_max <- if (is.null(prediction_distance_max)) {
+      observed_max_distance
+    } else {
+      prediction_distance_max
+    }
+
     # Split the data by model
     data_list <- split(range_test_detection_data, range_test_detection_data$model)
 
@@ -48,7 +83,7 @@
     })
 
     # Generate new data for predictions
-    new_distances <- data.frame(distance = seq(0, 400, 10))
+    new_distances <- data.frame(distance = seq(0, prediction_distance_max, length.out = 500))
     predictions <- lapply(models, function(model) {
       predict(model, newdata = new_distances, type = "response")
     })

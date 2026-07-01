@@ -24,10 +24,6 @@ Load RangeR and the packages used in the workflow.
 ```{r packages}
 library(FathomR)
 library(RangeR)
-library(readr)
-library(dplyr)
-library(purrr)
-library(ggplot2)
 ```
 
 ## Choose The Transmission Source
@@ -127,7 +123,8 @@ range_est <- run_drift_range_analysis(
   transmission_source = transmission_source,
   synthetic_transmit_data = NULL,
   time_buffer = 5,
-  dist_threshold = 1200
+  dist_threshold = 1200,
+  prediction_distance_max = 800
 )
 ```
 

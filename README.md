@@ -44,13 +44,15 @@ Steps to calculate Static Range Test
 
 ## Analysis Workflows
 
-Detailed workflow vignettes for drift and static range analyses are planned for a future release.
+Detailed workflow vignettes are now available covering the following topics: 
 
 Planned topics:
 
 - Drift range test workflow
+  - Transmissions captured using a VR100 
+  - Transmission reconstructed from a GPS tracklog 
 - Static range test workflow
-- Example end-to-end analysis using sample data
+  
 
 
 ## Main Functions
