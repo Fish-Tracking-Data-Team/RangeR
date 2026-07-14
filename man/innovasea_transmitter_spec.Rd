@@ -30,8 +30,8 @@ transmitter \verb{Full ID} field.}
 \item{trim_chars}{Logical; if \code{TRUE}, trim leading and trailing whitespace
 from all character columns.}
 
-\item{drop_missing_ids}{Logical; if \code{TRUE}, remove rows where the
-transmitter ID column is missing or blank.}
+\item{drop_missing_ids}{Logical; if \code{TRUE}, remove rows where the transmitter
+ID column is missing or blank.}
 
 \item{output}{Output format. \code{"both"} returns a list containing the imported
 specification table and the derived delay table. \code{"specs"} returns only

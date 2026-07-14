@@ -8,7 +8,8 @@ compile_drifts(
   detection.data,
   transmit.data,
   time_buffer = 5,
-  dist_threshold = 1200
+  dist_threshold = 1200,
+  prediction_distance_max = NULL
 )
 }
 \arguments{
@@ -20,6 +21,10 @@ compile_drifts(
 \item{time_buffer}{Time tolerance in seconds used for the fuzzy time join.}
 
 \item{dist_threshold}{Maximum distance (in meters) retained for modeling.}
+
+\item{prediction_distance_max}{Optional maximum distance (in meters) used
+when generating the prediction curve. Defaults to the maximum modeled
+detection distance.}
 }
 \value{
 A list with:

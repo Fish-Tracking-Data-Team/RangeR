@@ -15,7 +15,7 @@ get_closest_neighbor(current_receiver_id, distance_df, num_neighbors = 1)
 \item{num_neighbors}{Number of closest neighbors to return.}
 }
 \value{
-A data frame with \code{receiver_id}, \code{neighbor_id}, and \code{distance}.
+A data frame with \code{Ref_Station}, \code{Station}, and \code{distance}.
 }
 \description{
 Returns the nearest neighboring receiver(s) for a given receiver ID.

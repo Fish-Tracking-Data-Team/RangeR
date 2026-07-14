@@ -20,7 +20,7 @@ build_synthetic_transmission_log(
 )
 }
 \arguments{
-\item{full_id}{Character transmitter ID to assign to output rows.}
+\item{full_id}{Character vector of transmitter IDs to assign to output rows.}
 
 \item{gps_tracklog_path}{Path to a GPX or CSV tracklog.}
 
@@ -45,7 +45,10 @@ span from the first drift start to the last drift end.}
 
 \item{snap_mode}{Either \code{"interp"} or \code{"nearest"}.}
 
-\item{offset_sec}{Numeric offset in seconds from the first drift start.}
+\item{offset_sec}{Numeric offset in seconds between the start of each
+successive transmitter schedule. When \code{full_id} is supplied as a single
+numeric-like value, its schedule starts at (\code{full_id} - 1) * offset_sec.
+When multiple IDs are supplied, offsets are applied by position.}
 }
 \value{
 A tibble of synthetic transmission records with columns \code{Time},
