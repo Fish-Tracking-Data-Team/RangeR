@@ -101,7 +101,7 @@ Combines transmission data defined by the `extract_VR100_transmission` function 
 install.packages("remotes")
 
 # Use remotes to install the FathomR package from github repo
-remotes::install_github("hughpederson/RangeR", 
+remotes::install_github("Fish-Tracking-Data-Team/RangeR", 
                         build_vignettes = TRUE,
                         dependencies = TRUE)
 ```
